@@ -1,0 +1,6 @@
+{
+  "name": "FreeFire BattleZone - Esports Tournament Platform",
+  "description": "Professional Free Fire tournament app with BR Rank 40-Player (₹13/kill & auto-refund), CS Rank 4v4, Lone Wolf 1v1, anti-cheat integrity shield, live leaderboard, instant UPI wallet, and admin dashboard.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

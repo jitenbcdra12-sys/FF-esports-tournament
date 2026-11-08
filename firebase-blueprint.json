@@ -1,0 +1,108 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User profile with Free Fire In-Game credentials, wallet balance, and tournament stats",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Unique user ID matching auth UID" },
+        "name": { "type": "string", "description": "Player full name", "maxLength": 100 },
+        "email": { "type": "string", "description": "User email address", "format": "email" },
+        "phone": { "type": "string", "description": "Verified phone number", "maxLength": 20 },
+        "isPhoneVerified": { "type": "boolean", "description": "Whether phone OTP has been verified" },
+        "username": { "type": "string", "description": "Platform username", "maxLength": 50 },
+        "ffIgn": { "type": "string", "description": "Free Fire In-Game Name", "maxLength": 50 },
+        "ffUid": { "type": "string", "description": "Free Fire Numeric UID", "maxLength": 30 },
+        "avatarUrl": { "type": "string", "description": "Avatar image URL" },
+        "role": { "type": "string", "enum": ["player", "admin"] },
+        "wallet": {
+          "type": "object",
+          "description": "User wallet balances"
+        },
+        "stats": {
+          "type": "object",
+          "description": "Player match statistics"
+        },
+        "createdAt": { "type": "string", "description": "Creation timestamp" },
+        "updatedAt": { "type": "string", "description": "Last update timestamp" }
+      },
+      "required": ["id", "email", "role"]
+    },
+    "Match": {
+      "title": "Match",
+      "description": "Free Fire tournament match definition and registered slots",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Unique match ID" },
+        "matchNumber": { "type": "number", "description": "Sequential match number" },
+        "title": { "type": "string", "description": "Tournament title", "maxLength": 150 },
+        "mode": { "type": "string", "enum": ["br", "cs", "lonewolf"] },
+        "map": { "type": "string", "maxLength": 50 },
+        "version": { "type": "string", "enum": ["TPP", "FPP"] },
+        "entryFee": { "type": "number", "description": "Entry fee in INR" },
+        "perKillReward": { "type": "number", "description": "Per kill reward for BR (₹13)" },
+        "poolPrize": { "type": "number", "description": "Pool prize for CS (₹35) or Lone Wolf (₹9)" },
+        "capacity": { "type": "number", "description": "Max players: 40 for BR, 8 for CS, 2 for Lone Wolf" },
+        "scheduledTime": { "type": "string", "description": "Scheduled time (e.g. 07:30 AM)" },
+        "date": { "type": "string", "description": "Match date" },
+        "status": { "type": "string", "enum": ["upcoming", "open", "room_ready", "live", "completed", "cancelled_refunded"] },
+        "roomId": { "type": "string", "description": "Custom room ID" },
+        "roomPassword": { "type": "string", "description": "Custom room password" },
+        "registeredPlayers": { "type": "array", "description": "List of player slots" },
+        "isRefunded": { "type": "boolean", "description": "Whether auto-refund was processed" },
+        "refundReason": { "type": "string", "description": "Reason for cancellation" }
+      },
+      "required": ["id", "title", "mode", "entryFee", "capacity", "status"]
+    },
+    "Transaction": {
+      "title": "Transaction",
+      "description": "Wallet ledger record for deposits, withdrawals, fees, bounties, and auto-refunds",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Transaction ID" },
+        "userId": { "type": "string", "description": "User UID who owns the transaction" },
+        "type": { "type": "string", "enum": ["deposit", "withdrawal", "entry_fee", "kill_bounty", "win_prize", "auto_refund", "signup_bonus"] },
+        "amount": { "type": "number", "description": "Transaction amount in INR" },
+        "status": { "type": "string", "enum": ["completed", "pending", "failed"] },
+        "title": { "type": "string", "maxLength": 150 },
+        "description": { "type": "string", "maxLength": 250 },
+        "referenceId": { "type": "string", "maxLength": 100 },
+        "timestamp": { "type": "string" }
+      },
+      "required": ["id", "userId", "type", "amount", "status"]
+    },
+    "Notification": {
+      "title": "Notification",
+      "description": "Push notification alert for match status, room IDs, and wallet credits",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Notification ID" },
+        "userId": { "type": "string", "description": "Target user ID or empty for broadcast" },
+        "title": { "type": "string", "maxLength": 120 },
+        "body": { "type": "string", "maxLength": 300 },
+        "type": { "type": "string", "enum": ["match_alert", "wallet_credit", "wallet_debit", "auto_refund", "room_pass", "security"] },
+        "timestamp": { "type": "string" },
+        "isRead": { "type": "boolean" }
+      },
+      "required": ["id", "title", "body", "type", "isRead"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/User" },
+      "description": "User profile with FF IGN, UID, and wallet balances"
+    },
+    "/matches/{matchId}": {
+      "schema": { "$ref": "#/entities/Match" },
+      "description": "Tournament matches, slots, room IDs, and result status"
+    },
+    "/transactions/{transactionId}": {
+      "schema": { "$ref": "#/entities/Transaction" },
+      "description": "User wallet transaction ledger"
+    },
+    "/notifications/{notificationId}": {
+      "schema": { "$ref": "#/entities/Notification" },
+      "description": "Push notification messages"
+    }
+  }
+}
